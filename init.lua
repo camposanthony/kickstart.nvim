@@ -100,6 +100,7 @@ vim.g.have_nerd_font = false
 
 -- Make line numbers default
 vim.opt.number = true
+vim.opt.relativenumber = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.opt.relativenumber = true
@@ -262,6 +263,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  --[[
   {
     'Mofiqul/vscode.nvim',
     lazy = false,
@@ -274,6 +276,7 @@ require('lazy').setup({
       require('vscode').load()
     end,
   },
+  --]]
   {
     'nvim-tree/nvim-tree.lua',
     version = '*',
@@ -733,6 +736,7 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         pyright = {},
+        tsserver = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -772,10 +776,12 @@ require('lazy').setup({
       --
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
+      local ensure_installed = {
+        'typescript-language-server',
+        'pyright',
+        'lua-language-server',
         'stylua', -- Used to format Lua code
-      })
+      }
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -935,28 +941,33 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  {
+    'projekt0n/github-nvim-theme',
+    priority = 1000,
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
+      require('github-theme').setup {
+        options = {
+          transparent = true,
+          terminal_colors = true,
+          styles = {
+            comments = 'italic',
+            keywords = 'bold',
+            functions = 'italic,bold',
+            variables = 'NONE',
+          },
+          darken = {
+            floats = true,
+            sidebars = {
+              enable = true, -- <-- updated here!
+              list = {}, -- e.g. {'qf', 'vista_kind', 'terminal', 'packer'}
+            },
+          },
         },
+        -- theme_style = "dark_default",
       }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'vscode'
+      vim.cmd.colorscheme 'github_dark_default'
     end,
   },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 

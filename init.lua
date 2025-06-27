@@ -63,7 +63,6 @@ Kickstart Guide:
     This should be the first place you go to look when you're stuck or confused
     with something. It's one of my favorite Neovim features.
 
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
     which is very useful when you're not exactly sure of what you're looking for.
 
   I have left several `:help X` comments throughout the init.lua
@@ -178,6 +177,10 @@ vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Write (save) file' })
 
 -- Quit file
 vim.keymap.set('n', '<leader>q', ':q<CR>', { desc = 'Quit file' })
+
+-- Yank entire file by jumping around first
+vim.keymap.set('n', '<leader>z', 'ggVGy', { desc = 'Yank entire file' })
+vim.keymap.set('n', '<leader>Z', 'ggVGp', { desc = 'Replace entire file with register contents' })
 
 -- Open terminal
 vim.keymap.set('n', '<leader>t', ':terminal<CR>', { desc = 'Open terminal' })
@@ -801,47 +804,20 @@ require('lazy').setup({
     end,
   },
 
-  { -- Autoformat
+  { -- Auto-format on save with Prettier/Prettierd
     'stevearc/conform.nvim',
-    event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
-    keys = {
-      {
-        '<leader>f',
-        function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
-        end,
-        mode = '',
-        desc = '[F]ormat buffer',
-      },
-    },
+    event = 'BufWritePre',
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          return nil
-        else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
-          }
-        end
-      end,
       formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        typescript = { 'prettierd', stop_after_first = true },
+        typescriptreact = { 'prettierd', stop_after_first = true },
+        javascript = { 'prettierd', stop_after_first = true },
       },
+      -- always run conform.format on save
+      format_on_save = { timeout_ms = 500, lsp_format = 'fallback' },
     },
   },
-
   { -- Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',

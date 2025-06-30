@@ -927,30 +927,47 @@ require('lazy').setup({
   },
 
   {
-    'projekt0n/github-nvim-theme',
-    priority = 1000,
+    "Tsuzat/NeoSolarized.nvim",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      require('github-theme').setup {
-        options = {
-          transparent = true,
-          terminal_colors = true,
-          styles = {
-            comments = 'italic',
-            keywords = 'bold',
-            functions = 'italic,bold',
-            variables = 'NONE',
-          },
-          darken = {
-            floats = true,
-            sidebars = {
-              enable = true, -- <-- updated here!
-              list = {},     -- e.g. {'qf', 'vista_kind', 'terminal', 'packer'}
-            },
-          },
+      local ok_status, NeoSolarized = pcall(require, "NeoSolarized")
+      
+      if not ok_status then
+        return
+      end
+      
+      -- NeoSolarized configuration
+      NeoSolarized.setup {
+        style = "dark", -- "dark" or "light"
+        transparent = false, -- true/false; Enable this to disable setting the background color
+        terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
+        enable_italics = true, -- Italics for different highlight groups
+        styles = {
+          -- Style to be applied to different syntax groups
+          comments = { italic = true },
+          keywords = { italic = true },
+          functions = { bold = true },
+          variables = {},
+          string = { italic = true },
+          underline = true, -- true/false; for global underline
+          undercurl = true, -- true/false; for global undercurl
         },
-        -- theme_style = "dark_default",
+        -- Add specific highlight groups
+        on_highlights = function(highlights, colors) 
+          -- highlights.Include.fg = colors.red -- Using `red` foreground for Includes
+        end, 
       }
-      vim.cmd.colorscheme 'github_dark_default'
+      
+      -- Set colorscheme to NeoSolarized
+      vim.cmd [[
+        try
+          colorscheme NeoSolarized
+        catch /^Vim\%(\(\a\+\)\)\=:E185/
+          colorscheme default
+          set background=dark
+        endtry
+      ]]
     end,
   },
   -- Highlight todo, notes, etc in comments

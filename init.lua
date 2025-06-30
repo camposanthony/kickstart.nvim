@@ -940,7 +940,7 @@ require('lazy').setup({
       -- NeoSolarized configuration
       NeoSolarized.setup {
         style = "dark", -- "dark" or "light"
-        transparent = false, -- true/false; Enable this to disable setting the background color
+        transparent = true, -- true/false; Enable this to disable setting the background color
         terminal_colors = true, -- Configure the colors used when opening a `:terminal` in Neovim
         enable_italics = true, -- Italics for different highlight groups
         styles = {
